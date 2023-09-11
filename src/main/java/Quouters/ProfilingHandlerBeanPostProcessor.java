@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ProfilingHaandlerBeanPostProcessor implements BeanPostProcessor {
+public class ProfilingHandlerBeanPostProcessor implements BeanPostProcessor {
     private Map<String, Class> map = new HashMap<>();
     private ProfilingController controller = new ProfilingController();
 
-    public ProfilingHaandlerBeanPostProcessor() throws Exception {
+    public ProfilingHandlerBeanPostProcessor() throws Exception {
         MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-        platformMBeanServer.registerMBean(controller,new ObjectName("profiling", "name", "contoller"));
+        platformMBeanServer.registerMBean(controller,new ObjectName("profiling", "name", "controller"));
     }
 
     @Override
@@ -39,12 +39,14 @@ public class ProfilingHaandlerBeanPostProcessor implements BeanPostProcessor {
                 @Override
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                     if(controller.isEnabled()){
+                        System.out.println("/------------/");
                         System.out.println("Profiling");
                         long before = System.nanoTime();
                         Object retVal = method.invoke(bean,args);
                         long after = System.nanoTime();
                         System.out.println(after - before);
                         System.out.println("Done");
+                        System.out.println("/------------/");
                         return retVal;
                     }else{
                         return method.invoke(bean,args);
